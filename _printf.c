@@ -1,45 +1,44 @@
 #include "holberton.h"
-
 /**
- *_printf - Print a formatted string
- *@format: format string
- *Return: number of characters printed
+ * _printf - printf function
+ * @format: const char pointer
+ * Return: b_len
+ * this is the start of the file
  */
 int _printf(const char *format, ...)
 {
-	int (*print_function)(va_list, param_func *);
-	va_list list;
-	const char *pointer;
-	param_func flags = {0, 0, 0};
+	int (*pfunc)(va_list, flags_t *);
+	const char *p;
+	va_list arguments;
+	flags_t flags = {0, 0, 0};
 
 	register int count = 0;
 
-	va_start(list, format);
+	va_start(arguments, format);
 	if (!format || (format[0] == '%' && !format[1]))
 		return (-1);
 	if (format[0] == '%' && format[1] == ' ' && !format[2])
 		return (-1);
-	for (pointer = format; *pointer; pointer++)
+	for (p = format; *p; p++)
 	{
-		if (*pointer == '%')
+		if (*p == '%')
 		{
-			pointer++;
-			if (*pointer == '%')
+			p++;
+			if (*p == '%')
 			{
 				count += _putchar('%');
 				continue;
 			}
-			while (get_flags(*pointer, &flags))
-				pointer++;
-			print_function = func_parse(*pointer);
-			count += (print_function)
-						 ? print_function(list, &flags)
-						 : _printf("%%%c", *pointer);
-		}
-		else
-			count += _putchar(*pointer);
+			while (get_flag(*p, &flags))
+				p++;
+			pfunc = get_print(*p);
+			count += (pfunc)
+				? pfunc(arguments, &flags)
+				: _printf("%%%c", *p);
+		} else
+			count += _putchar(*p);
 	}
 	_putchar(-1);
-	va_end(list);
+	va_end(arguments);
 	return (count);
 }
