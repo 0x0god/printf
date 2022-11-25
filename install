@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo cp man_3_printf /usr/local/man/man1
+sudo gzip man_3_printf /usr/local/man/ma1/man_3_printf
+sudo mandb
+

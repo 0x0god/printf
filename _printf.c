@@ -1,51 +1,45 @@
-#include "main.h"
+#include "holberton.h"
 
 /**
- * _printf - produces output according to a format.
- * @format: Input character string.
- * Return: The number of characters printed.
+ *_printf - Print a formatted string
+ *@format: format string
+ *Return: number of characters printed
  */
-
 int _printf(const char *format, ...)
 {
-	unsigned int i = 0, len = 0, ibuf = 0;
-	va_list arguments;
-	int (*function)(va_list, char *, unsigned int);
-	char *buffer;
+	int (*print_function)(va_list, param_func *);
+	va_list list;
+	const char *pointer;
+	param_func flags = {0, 0, 0};
 
-	va_start(arguments, format), buffer = malloc(sizeof(char) * 1024);
-	if (!format || !buffer || (format[i] == '%' && !format[i + 1]))
+	register int count = 0;
+
+	va_start(list, format);
+	if (!format || (format[0] == '%' && !format[1]))
 		return (-1);
-	if (!format[i])
-		return (0);
-	for (i = 0; format && format[i]; i++)
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return (-1);
+	for (pointer = format; *pointer; pointer++)
 	{
-		if (format[i] == '%')
+		if (*pointer == '%')
 		{
-			if (format[i + 1] == '\0')
+			pointer++;
+			if (*pointer == '%')
 			{
-				print_buffer(buffer, ibuf), free(buffer), va_end(arguments);
-				return (-1);
+				count += _putchar('%');
+				continue;
 			}
-			else
-			{
-				function = get_func(format, i + 1);
-				if (function == NULL)
-				{
-					if (format[i + 1] == ' ' && !format[i + 2])
-						return (-1);
-					cat_buffer(buffer, format[i], ibuf), len++, i--;
-				} else
-				{
-					len += function(arguments, buffer, ibuf);
-					i += ev_print_func(format, i + 1);
-				}
-			} i++;
-		} else
-			cat_buffer(buffer, format[i], ibuf), len++;
-		for (ibuf = len; ibuf > 1024; ibuf -= 1024)
-			;
+			while (get_flags(*pointer, &flags))
+				pointer++;
+			print_function = func_parse(*pointer);
+			count += (print_function)
+						 ? print_function(list, &flags)
+						 : _printf("%%%c", *pointer);
+		}
+		else
+			count += _putchar(*pointer);
 	}
-	print_buffer(buffer, ibuf), free(buffer), va_end(arguments);
-	return (len);
+	_putchar(-1);
+	va_end(list);
+	return (count);
 }

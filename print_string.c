@@ -1,26 +1,31 @@
-#include "main.h"
+#include "holberton.h"
 
 /**
- * print_string - prints the string to stdout
- * @arguments: input string
- * @buf: buffer pointer
- * @ibuf: index for buffer pointer
- * Return: On success 1.
+ *print_chars - prints a char
+ *@list: list of arguments
+ *@func: pointer to the struct flags in which we turn the flags on
+ *Return: number of characters printed.
  */
-int print_string(va_list arguments, char *buf, unsigned int ibuf)
+int print_chars(va_list list, param_func *func)
+{
+	(void)func;
+	_putchar(va_arg(list, int));
+	return (1);
+}
+
+/**
+ *print_strings - prints strings
+ *@list: list of arguments
+ *@func: pointer to the struct flags in which we turn the flags on/off
+ *Return: number of characters printed
+ */
+int print_strings(va_list list, param_func *func)
 {
 	char *str;
-	unsigned int i;
-	char nill[] = "(null)";
 
-	str = va_arg(arguments, char *);
-	if (str == NULL)
-	{
-		for (i = 0; nill[i]; i++)
-			ibuf = cat_buffer(buf, nill[i], ibuf);
-		return (6);
-	}
-	for (i = 0; str[i]; i++)
-		ibuf = cat_buffer(buf, str[i], ibuf);
-	return (i);
+	str = va_arg(list, char *);
+	(void)func;
+	if (!str)
+		str = "(null)";
+	return (_puts(str));
 }
