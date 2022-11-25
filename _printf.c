@@ -1,44 +1,51 @@
-#include "holberton.h"
+#include "main.h"
+
 /**
- * _printf - printf function
- * @format: const char pointer
- * Return: b_len
- * this is the start of the file
+ * _printf - produces output according to a format.
+ * @format: Input character string.
+ * Return: The number of characters printed.
  */
+
 int _printf(const char *format, ...)
 {
-	int (*pfunc)(va_list, flags_t *);
-	const char *p;
+	unsigned int i = 0, len = 0, ibuf = 0;
 	va_list arguments;
-	flags_t flags = {0, 0, 0};
+	int (*function)(va_list, char *, unsigned int);
+	char *buffer;
 
-	register int count = 0;
-
-	va_start(arguments, format);
-	if (!format || (format[0] == '%' && !format[1]))
+	va_start(arguments, format), buffer = malloc(sizeof(char) * 1024);
+	if (!format || !buffer || (format[i] == '%' && !format[i + 1]))
 		return (-1);
-	if (format[0] == '%' && format[1] == ' ' && !format[2])
-		return (-1);
-	for (p = format; *p; p++)
+	if (!format[i])
+		return (0);
+	for (i = 0; format && format[i]; i++)
 	{
-		if (*p == '%')
+		if (format[i] == '%')
 		{
-			p++;
-			if (*p == '%')
+			if (format[i + 1] == '\0')
 			{
-				count += _putchar('%');
-				continue;
+				print_buffer(buffer, ibuf), free(buffer), va_end(arguments);
+				return (-1);
 			}
-			while (get_flag(*p, &flags))
-				p++;
-			pfunc = get_print(*p);
-			count += (pfunc)
-				? pfunc(arguments, &flags)
-				: _printf("%%%c", *p);
+			else
+			{
+				function = get_func(format, i + 1);
+				if (function == NULL)
+				{
+					if (format[i + 1] == ' ' && !format[i + 2])
+						return (-1);
+					cat_buffer(buffer, format[i], ibuf), len++, i--;
+				} else
+				{
+					len += function(arguments, buffer, ibuf);
+					i += ev_print_func(format, i + 1);
+				}
+			} i++;
 		} else
-			count += _putchar(*p);
+			cat_buffer(buffer, format[i], ibuf), len++;
+		for (ibuf = len; ibuf > 1024; ibuf -= 1024)
+			;
 	}
-	_putchar(-1);
-	va_end(arguments);
-	return (count);
+	print_buffer(buffer, ibuf), free(buffer), va_end(arguments);
+	return (len);
 }
